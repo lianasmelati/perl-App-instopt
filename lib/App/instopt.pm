@@ -37,6 +37,21 @@ our %args_common = (
     },
 );
 
+our %argopt_quiet = (
+    quiet => {
+        schema => 'bool*',
+        cmdline_aliases => {q=>{}},
+        tags => ['category:output'],
+    },
+);
+
+our %argopt_up_to_date = (
+    up_to_date => {
+        schema => 'bool*',
+        cmdline_aliases => {q=>{}},
+    },
+);
+
 our %argopt_arch = (
     arch => {
         schema => ['software::arch*'],
@@ -276,6 +291,48 @@ sub list_installed {
     }
 
     [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{is_installed} = {
+    v => 1.1,
+    summary => 'Check whether a software installed',
+    description => <<'_',
+
+By default, it does not check whether the installed version is up-to-date. To do
+that, use the `--up-to-date` option.
+
+_
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+        %argopt_quiet,
+        %argopt_up_to_date,
+    },
+    examples => [
+        {
+            summary => 'Check that zotero is installed',
+            argv => [],
+            test => 0,
+            'x.doc.show_result' => 1,
+        },
+        {
+            summary => 'Check that zotero is installed and up-to-date',
+            argv => ['--up-to-date'],
+            test => 0,
+            'x.doc.show_result' => 1,
+        },
+        {
+            summary => 'Check that zotero is installed and *NOT* up-to-date',
+            argv => ['zotero', '--noup-to-date'],
+            test => 0,
+            'x.doc.show_result' => 1,
+        },
+    ],
+};
+sub is_installed {
+    require File::Slurper;
+
+    #...
 }
 
 $SPEC{list_installed_versions} = {
